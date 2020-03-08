@@ -1,0 +1,38 @@
+﻿<Window x:Class="WeightBalancePlus.Views.EditBaggageConfiguration"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:props="clr-namespace:WeightBalancePlus.Properties"
+        xmlns:vm="clr-namespace:WeightBalancePlus.ViewModels"
+        mc:Ignorable="d"
+        Title="{x:Static props:Resources.EditBaggageConfiguration}" Height="300" Width="300" WindowStartupLocation="CenterOwner" WindowStyle="SingleBorderWindow"
+        ResizeMode="NoResize" ShowInTaskbar="False"
+        d:DataContext="{d:DesignInstance {x:Type vm:EditBaggageConfigurationViewModel}}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <DockPanel LastChildFill="True" Grid.Row="0" Margin="5">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom">
+                <Button Content="+" Command="{Binding AddRowCommand}" Foreground="Green" FontWeight="Bold" FontSize="14"
+                                        Width="24" Margin="0,2,5,0"/>
+                <Button Content="-" Command="{Binding RemoveRowCommand}" Foreground="Red" FontWeight="Bold" FontSize="14"
+                                        Width="24" Margin="0,2,5,0"/>
+            </StackPanel>
+            <DataGrid ItemsSource="{Binding BaggageCompartments}" SelectedItem="{Binding SelectedRow}" AutoGenerateColumns="False" CanUserAddRows="False"
+                      RowHeaderWidth="0" Background="White">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="{x:Static props:Resources.CenterGravity}" Binding="{Binding CenterGravity, Mode=TwoWay, StringFormat=N1}" Width="*" MinWidth="100"/>
+                    <DataGridTextColumn Header="{x:Static props:Resources.MaxWeight}" Binding="{Binding MaxWeight, Mode=TwoWay}" Width="*" MinWidth="70"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Height="24" Margin="5">
+            <Button Content="{x:Static props:Resources.OK}" Command="{Binding OKCommand}" IsDefault="True" MinWidth="75" Margin="5,0,0,0"/>
+            <Button Content="{x:Static props:Resources.Cancel}" Command="{Binding CancelCommand}" IsCancel="True" MinWidth="75" Margin="5,0,0,0"/>
+        </StackPanel>
+    </Grid>
+</Window>

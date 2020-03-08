@@ -1,0 +1,20 @@
+Icons:
+Ege Ozkaya from www.iconfinder.com
+Freepik from www.flaticon.com
+Pixel Perfect from www.flaticon.com
+The Icon Tree from www.iconfinder.com
+Those Icons from www.flaticon.com
+
+Nuget packages:
+CommonServiceLocator - Microsoft.Practices.ServiceLocation
+ControlzEx - Jan Karger, Bastian Schmidt, James Willock
+Expression.Blend.Sdk - Microsoft
+Expression.Blend.Sdk.WPF - Microsoft
+Extended.Wpf.Toolkit - Xceed
+Fluent.Ribbon - Bastian Schmidt
+Microsoft.Xaml.Behaviors.Wpf - Microsoft
+MvvmDialogs - Mattias Kindborg
+MvvmLightLibs - Laurent Bugnion (GalaSoft)
+OxyPlot.Core - OxyPlot
+OxyPlot.Wpf - OxyPlot
+System.Windows.Interactivity - Microsoft

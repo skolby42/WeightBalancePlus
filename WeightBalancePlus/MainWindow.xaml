@@ -1,0 +1,257 @@
+﻿<Fluent:RibbonWindow x:Class="WeightBalancePlus.MainWindow"
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                     xmlns:Fluent="urn:fluent-ribbon"
+                     xmlns:oxy="http://oxyplot.org/wpf"
+                     xmlns:behaviors="clr-namespace:WeightBalancePlus.Behaviors"
+                     xmlns:props="clr-namespace:WeightBalancePlus.Properties"
+                     xmlns:converters="clr-namespace:WeightBalancePlus.Converters"
+                     xmlns:views="clr-namespace:WeightBalancePlus.Views"
+                     xmlns:vm="clr-namespace:WeightBalancePlus.ViewModels"
+                     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                     xmlns:md="https://github.com/fantasticfiasco/mvvm-dialogs"
+                     md:DialogServiceViews.IsRegistered="True"
+                     mc:Ignorable="d"
+                     Title="{x:Static props:Resources.AppTitle}" Height="600" Width="800" MinHeight="450" MinWidth="800" 
+                     WindowStartupLocation="CenterScreen"
+                     d:DataContext="{d:DesignInstance {x:Type vm:MainViewModel}}">
+
+    <Fluent:RibbonWindow.Resources>
+        <CollectionViewSource x:Key="loadGroups" Source="{Binding ActiveAircraftViewModel.LoadItems, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="LoadCategory" />
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
+
+        <Style TargetType="{x:Type DataGridRow}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsReadOnly}" Value="True">
+                    <Setter Property="behaviors:ReadOnlyService.IsReadOnly" Value="True"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <converters:DataPointConverter x:Key="DataPointConverter"/>
+        <converters:GreaterThanZeroVisibilityConverter x:Key="GreaterThanZeroVisibilityConverter"/>
+
+        <DataTemplate x:Key="BaggageCellEditingTemplate_CenterGravity">
+            <ComboBox ItemsSource="{Binding Path=DataContext.ActiveAircraftViewModel.BaggageCompartments, RelativeSource={RelativeSource AncestorType={x:Type Fluent:RibbonWindow}}}"
+                      DisplayMemberPath="DisplayName" SelectedValuePath="CenterGravity"
+                      SelectedValue="{Binding CenterGravity, UpdateSourceTrigger=PropertyChanged}"
+                      BorderThickness="0" Padding="3,0,3,0" Height="18"/>
+        </DataTemplate>
+        <DataTemplate x:Key="PersonCellEditingTemplate_CenterGravity">
+            <ComboBox ItemsSource="{Binding Path=DataContext.ActiveAircraftViewModel.SeatRows, RelativeSource={RelativeSource AncestorType={x:Type Fluent:RibbonWindow}}}"
+                      DisplayMemberPath="DisplayName" SelectedValuePath="CenterGravity"
+                      SelectedValue="{Binding CenterGravity, UpdateSourceTrigger=PropertyChanged}"
+                      BorderThickness="0" Padding="3,0,3,0" Height="18"/>
+        </DataTemplate>
+        <DataTemplate x:Key="LoadItemCellEditingTemplate_CenterGravity">
+            <TextBox Text="{Binding Path=CenterGravity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N1}" 
+                     BorderThickness="0"/>
+        </DataTemplate>
+        <DataTemplate x:Key="CellEditingTemplate_Moment_ReadOnly">
+            <TextBlock Text="{Binding Path=Moment, UpdateSourceTrigger=PropertyChanged, StringFormat=N1}"/>
+        </DataTemplate>
+        <DataTemplate x:Key="CellEditingTemplate_Moment">
+            <TextBox Text="{Binding Path=Moment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N1}" 
+                     BorderThickness="0"/>
+        </DataTemplate>
+    </Fluent:RibbonWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Fluent:Ribbon Grid.Row="0" Grid.ColumnSpan="2" IsQuickAccessToolBarVisible="False">
+            <Fluent:RibbonTabItem Header="{x:Static props:Resources.Main}">
+                <Fluent:RibbonGroupBox Header="{x:Static props:Resources.File}">
+                    <Fluent:Button Header="{x:Static props:Resources.Exit}" Command="{Binding ExitCommand}"
+                                   Icon="pack://application:,,,/WeightBalancePlus;component/Resources/Images/Exit.png"
+                                   LargeIcon="pack://application:,,,/WeightBalancePlus;component/Resources/Images/Exit.png"/>
+                    <Fluent:Button Header="{x:Static props:Resources.Save}" Command="{Binding SaveCommand}"
+                                   Icon="pack://application:,,,/WeightBalancePlus;component/Resources/Images/Save.png"
+                                   LargeIcon="pack://application:,,,/WeightBalancePlus;component/Resources/Images/Save.png"/>
+                    <Fluent:ComboBox Header="{x:Static props:Resources.Aircraft}" InputWidth="120" ResizeMode="Both" DisplayMemberPath="DisplayName"
+                                     MaxDropDownHeight="Auto" IsEditable="False"
+                                     ItemsSource="{Binding AircraftList}" SelectedItem="{Binding ActiveAircraftViewModel, UpdateSourceTrigger=PropertyChanged}" Margin="0,10"/>
+                </Fluent:RibbonGroupBox>
+                <Fluent:RibbonGroupBox Header="{x:Static props:Resources.Loading}">
+                    <Fluent:DropDownButton Header="{x:Static props:Resources.Add}"
+                                           Icon="pack://application:,,,/WeightBalancePlus;component/Resources/Images/Plus.png"
+                                           LargeIcon="pack://application:,,,/WeightBalancePlus;component/Resources/Images/Plus.png">
+                        <Fluent:Button Header="{x:Static props:Resources.AddPassenger}" Size="Middle" 
+                                       Command="{Binding ActiveAircraftViewModel.AddPassengerCommand}"
+                                       ToolTip="{x:Static props:Resources.AddPassengerTooltip}"
+                                       Icon="pack://application:,,,/WeightBalancePlus;component/Resources/Images/AddUser.png"
+                                       LargeIcon="pack://application:,,,/WeightBalancePlus;component/Resources/Images/AddUser.png"/>
+                        <Fluent:Button Header="{x:Static props:Resources.AddBaggage}" Size="Middle"
+                                       ToolTip="{x:Static props:Resources.AddBaggageTooltip}"
+                                       Command="{Binding ActiveAircraftViewModel.AddBaggageCommand}"
+                                       Icon="pack://application:,,,/WeightBalancePlus;component/Resources/Images/Baggage.png"
+                                       LargeIcon="pack://application:,,,/WeightBalancePlus;component/Resources/Images/Baggage.png"/>
+                    </Fluent:DropDownButton>
+                    <Fluent:Button Header="{x:Static props:Resources.Remove}" 
+                                   Command="{Binding ActiveAircraftViewModel.RemoveLoadItemCommand}"
+                                   ToolTip="{x:Static props:Resources.RemoveTooltip}"
+                                   Icon="pack://application:,,,/WeightBalancePlus;component/Resources/Images/Minus.png"
+                                   LargeIcon="pack://application:,,,/WeightBalancePlus;component/Resources/Images/Minus.png"/>
+                </Fluent:RibbonGroupBox>
+                <Fluent:RibbonGroupBox Header="{x:Static props:Resources.ToolsHelp}">
+                    <Fluent:Button Header="{x:Static props:Resources.Settings}"
+                                   Command="{Binding SettingsCommand}"
+                                   Icon="pack://application:,,,/WeightBalancePlus;component/Resources/Images/Gear.png"
+                                   LargeIcon="pack://application:,,,/WeightBalancePlus;component/Resources/Images/Gear.png"/>
+                    <Fluent:Button Header="{x:Static props:Resources.About}"
+                                   Command="{Binding AboutCommand}"
+                                   Icon="pack://application:,,,/WeightBalancePlus;component/Resources/Images/About.png"
+                                   LargeIcon="pack://application:,,,/WeightBalancePlus;component/Resources/Images/About.png"/>
+                </Fluent:RibbonGroupBox>
+            </Fluent:RibbonTabItem>
+        </Fluent:Ribbon>
+        
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <StackPanel HorizontalAlignment="Left" Margin="5">
+                <TextBlock Text="{x:Static props:Resources.StartingFuel}"/>
+                <xctk:DoubleUpDown Value="{Binding ActiveAircraftViewModel.StartFuel, Mode=TwoWay}"
+                                   Minimum="0" Maximum="{Binding ActiveAircraftViewModel.FuelCapacity}"
+                                   FormatString="N1" Width="120"/>
+            </StackPanel>
+            <StackPanel HorizontalAlignment="Left" Margin="5">
+                <TextBlock Text="{x:Static props:Resources.TaxiBurn}"/>
+                <xctk:DoubleUpDown Value="{Binding ActiveAircraftViewModel.TaxiBurn, Mode=TwoWay}"
+                                   Minimum="0" Maximum="{Binding ActiveAircraftViewModel.StartFuel}"
+                                   FormatString="N1" Width="120"/>
+            </StackPanel>
+            <StackPanel HorizontalAlignment="Left" Margin="5">
+                <TextBlock Text="{x:Static props:Resources.EnrouteBurn}"/>
+                <xctk:DoubleUpDown Value="{Binding ActiveAircraftViewModel.EnrouteBurn, Mode=TwoWay}"
+                                   Minimum="0" Maximum="{Binding ActiveAircraftViewModel.StartFuel}"
+                                   FormatString="N1" Width="120"/>
+            </StackPanel>
+        </StackPanel>
+
+        <DockPanel Grid.Row="2" LastChildFill="True">
+            <DataGrid Background="White" ItemsSource="{Binding Source={StaticResource loadGroups}}"
+                      SelectedItem="{Binding ActiveAircraftViewModel.SelectedLoadItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      AutoGenerateColumns="False" RowHeaderWidth="0" CanUserAddRows="False"
+                      CellEditEnding="DataGrid_CellEditEnding" HorizontalScrollBarVisibility="Auto">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="{x:Static props:Resources.Name}" 
+                                        Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        Width="*" MinWidth="100"/>
+                    <DataGridTextColumn Header="{x:Static props:Resources.Weight}" 
+                                        Binding="{Binding Weight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N1}"
+                                        Width="*" MinWidth="50"/>
+                    <DataGridTemplateColumn Header="{x:Static props:Resources.CenterGravity}" Width="2*" MinWidth="140">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=CenterGravity, StringFormat=N1}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplateSelector>
+                            <views:CellEditingTemplateSelector 
+                                BaggageCellEditingTemplate="{StaticResource BaggageCellEditingTemplate_CenterGravity}"
+                                PersonCellEditingTemplate="{StaticResource PersonCellEditingTemplate_CenterGravity}"
+                                LoadItemCellEditingTemplate="{StaticResource LoadItemCellEditingTemplate_CenterGravity}"/>
+                        </DataGridTemplateColumn.CellEditingTemplateSelector>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="{x:Static props:Resources.Moment}" Width="*" MinWidth="60">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=Moment, StringFormat=N1}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplateSelector>
+                            <views:CellEditingTemplateSelector 
+                                BaggageCellEditingTemplate="{StaticResource CellEditingTemplate_Moment_ReadOnly}"
+                                PersonCellEditingTemplate="{StaticResource CellEditingTemplate_Moment_ReadOnly}"
+                                LoadItemCellEditingTemplate="{StaticResource CellEditingTemplate_Moment}"/>
+                        </DataGridTemplateColumn.CellEditingTemplateSelector>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+
+                <i:Interaction.Behaviors>
+                    <behaviors:DataGridRowReadOnlyBehavior/>
+                </i:Interaction.Behaviors>
+
+                <DataGrid.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.ContainerStyle>
+                            <Style TargetType="{x:Type GroupItem}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type GroupItem}">
+                                            <DockPanel LastChildFill="True">
+                                                <Expander IsExpanded="True" DockPanel.Dock="Top">
+                                                    <Expander.Header>
+                                                        <DockPanel>
+                                                            <TextBlock Text="{Binding Name}" />
+                                                        </DockPanel>
+                                                    </Expander.Header>
+                                                    <Expander.Content>
+                                                        <ItemsPresenter Margin="0,0,-2,0" />
+                                                    </Expander.Content>
+                                                </Expander>
+                                            </DockPanel>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GroupStyle.ContainerStyle>
+                    </GroupStyle>
+                </DataGrid.GroupStyle>
+            </DataGrid>
+        </DockPanel>
+
+        <DockPanel LastChildFill="True" Grid.Column="1" Grid.Row="1" Grid.RowSpan="2">
+            <oxy:Plot IsLegendVisible="{Binding SettingsViewModel.ShowLegend}" LegendPosition="BottomRight" LegendBackground="White" LegendBorder="Black">
+                <oxy:Plot.Annotations>
+                    <oxy:PointAnnotation Size="5" TextHorizontalAlignment="Left" TextVerticalAlignment="Center" 
+                                         Fill="{Binding ActiveAircraftViewModel.TakeoffColor, UpdateSourceTrigger=PropertyChanged}"
+                                         Text="{Binding ActiveAircraftViewModel.TakeoffAnnotationText, UpdateSourceTrigger=PropertyChanged}" 
+                                         X="{Binding ActiveAircraftViewModel.TakeoffCenterGravity, UpdateSourceTrigger=PropertyChanged}" 
+                                         Y="{Binding ActiveAircraftViewModel.TakeoffWeight, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <oxy:PointAnnotation Size="5" TextHorizontalAlignment="Left" TextVerticalAlignment="Center"
+                                         Fill="{Binding ActiveAircraftViewModel.LandingColor, UpdateSourceTrigger=PropertyChanged}"
+                                         Text="{Binding ActiveAircraftViewModel.LandingAnnotationText, UpdateSourceTrigger=PropertyChanged}" 
+                                         X="{Binding ActiveAircraftViewModel.LandingCenterGravity, UpdateSourceTrigger=PropertyChanged}" 
+                                         Y="{Binding ActiveAircraftViewModel.LandingWeight, UpdateSourceTrigger=PropertyChanged}" />
+                </oxy:Plot.Annotations>
+                
+                <oxy:Plot.Axes>
+                    <oxy:LinearAxis Position="Bottom" IsZoomEnabled="True" Title="{x:Static props:Resources.CenterGravity}" 
+                                    Minimum="{Binding ActiveAircraftViewModel.MinX, UpdateSourceTrigger=PropertyChanged}" 
+                                    Maximum="{Binding ActiveAircraftViewModel.MaxX, UpdateSourceTrigger=PropertyChanged}"/>
+                    <oxy:LinearAxis Position="Left" IsZoomEnabled="True" Title="{x:Static props:Resources.Weight}"
+                                    Minimum="{Binding ActiveAircraftViewModel.MinY, UpdateSourceTrigger=PropertyChanged}" 
+                                    Maximum="{Binding ActiveAircraftViewModel.MaxY, UpdateSourceTrigger=PropertyChanged}"/>
+                </oxy:Plot.Axes>
+                
+                <oxy:Plot.Series>
+                    <oxy:LineSeries ItemsSource="{Binding ActiveAircraftViewModel.NormalPlotPoints, Converter={StaticResource DataPointConverter}}"
+                                    Title="{x:Static props:Resources.Normal}" 
+                                    Color="{Binding SettingsViewModel.NormalColor, UpdateSourceTrigger=PropertyChanged}"
+                                    LineStyle="{Binding SettingsViewModel.NormalLineStyle, UpdateSourceTrigger=PropertyChanged}" />
+                    <oxy:LineSeries ItemsSource="{Binding ActiveAircraftViewModel.UtilityPlotPoints, Converter={StaticResource DataPointConverter}}" 
+                                    Title="{x:Static props:Resources.Utility}"
+                                    Visibility="{Binding ActiveAircraftViewModel.UtilityPlotPoints, Converter={StaticResource GreaterThanZeroVisibilityConverter}}"
+                                    Color="{Binding SettingsViewModel.UtilityColor, UpdateSourceTrigger=PropertyChanged}"
+                                    LineStyle="{Binding SettingsViewModel.UtilityLineStyle, UpdateSourceTrigger=PropertyChanged}" />
+                </oxy:Plot.Series>
+                
+            </oxy:Plot>
+        </DockPanel>
+    </Grid>
+</Fluent:RibbonWindow>
