@@ -24,7 +24,7 @@ DisableProgramGroupPage=yes
 LicenseFile=..\WeightBalancePlus\Resources\TextFiles\License.txt
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputDir=..\Intstaller\
+OutputDir=..\Installer\
 OutputBaseFilename=WeightBalancePlusInstaller
 SetupIconFile=..\WeightBalancePlus\WeightBalancePlus.ico
 Compression=lzma
