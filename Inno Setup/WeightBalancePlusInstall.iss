@@ -29,6 +29,8 @@ OutputBaseFilename=WeightBalancePlusInstaller
 SetupIconFile=..\WeightBalancePlus\WeightBalancePlus.ico
 Compression=lzma
 SolidCompression=yes
+UninstallDisplayIcon={app}\{#MyAppExeName}
+UninstallDisplayName={#MyAppName}
 WizardStyle=modern
 
 [Languages]
