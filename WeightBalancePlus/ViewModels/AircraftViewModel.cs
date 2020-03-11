@@ -379,7 +379,8 @@ namespace WeightBalancePlus.ViewModels
         {
             get
             {
-                return ShowAnnotationDetail ? $"{Resources.Takeoff}, ({TakeoffCenterGravity:N1}, {TakeoffWeight:N1})" : Resources.Takeoff;
+                string text = ShowAnnotationDetail ? $"{Resources.Takeoff}, ({TakeoffCenterGravity:N1}, {TakeoffWeight:N1})" : Resources.Takeoff;
+                return ShowTakeoffAnnotation() ? text : string.Empty;
             }
         }
         public string LandingAnnotationText
@@ -387,14 +388,14 @@ namespace WeightBalancePlus.ViewModels
             get
             {
                 string text = ShowAnnotationDetail ? $"{Resources.Landing}, ({LandingCenterGravity:N1}, {LandingWeight:N1})" : Resources.Landing;
-                return EnrouteBurn == 0 ? string.Empty : text;
+                return ShowLandingAnnotation() ? text : string.Empty;
             }
         }
 
         public bool ShowAnnotationDetail { get; set; }
 
-        public Color TakeoffColor => Colors.DarkGreen;
-        public Color LandingColor => EnrouteBurn == 0 ? Colors.Transparent : Colors.DarkRed;
+        public Color TakeoffColor => ShowTakeoffAnnotation() ? Colors.DarkGreen : Colors.Transparent;
+        public Color LandingColor => ShowLandingAnnotation() ? Colors.DarkRed : Colors.Transparent;
 
         public double MaxX
         {
@@ -433,7 +434,8 @@ namespace WeightBalancePlus.ViewModels
             get
             {
                 double min = GetMinOrMaxY(true);
-                min = Math.Min(min, TakeoffWeight);
+                if (TakeoffWeight > 0)
+                    min = Math.Min(min, TakeoffWeight);
                 return PlotHelper.AddPlotMinBuffer(min);
             }
         }
@@ -513,6 +515,8 @@ namespace WeightBalancePlus.ViewModels
         private double GetMinCenterGravity(double plotMin)
         {
             var minCenterGravity = Math.Max(TakeoffCenterGravity, LandingCenterGravity);
+            if (minCenterGravity == 0)
+                return plotMin;
             return Math.Min(plotMin, minCenterGravity);
         }
 
@@ -539,6 +543,9 @@ namespace WeightBalancePlus.ViewModels
             }
             else
             {
+                if (pilots.Count == 1)
+                    pilots[0].Name = Resources.Pilot;
+
                 for (int i = pilots.Count; i < TargetAircraft.RequiredCrew; i++)
                 {
                     var seatRow = SeatRows.FirstOrDefault(x => x.PilotSeats);
@@ -546,7 +553,7 @@ namespace WeightBalancePlus.ViewModels
                         return;
 
                     string name = Resources.Pilot;
-                    if (i >= 0)
+                    if (i > 1)
                         name = Resources.Copilot;
                     LoadItems.Add(new Pilot(170, name)
                     {
@@ -637,6 +644,16 @@ namespace WeightBalancePlus.ViewModels
         private void LoadItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             UpdatePlot();
+        }
+
+        private bool ShowTakeoffAnnotation()
+        {
+            return TakeoffCenterGravity != 0 && TakeoffWeight != 0;
+        }
+
+        private bool ShowLandingAnnotation()
+        {
+            return EnrouteBurn > 0 && LandingCenterGravity != 0 && LandingWeight != 0;
         }
 
         #endregion
