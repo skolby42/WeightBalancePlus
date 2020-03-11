@@ -4,12 +4,9 @@ Tool to calculate aircraft loading and verify if it is within the operating enve
 
 * Main Window
 ![Main Window](/Images/MainWindow.png)
-Format: ![Alt Text](url)
 
 * Settings
 ![Settings](/Images/Settings.png)
-Format: ![Alt Text](url)
 
 * Load Envelope
 ![Settings](/Images/LoadEnvelope.png)
-Format: ![Alt Text](url)
