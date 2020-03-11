@@ -536,16 +536,28 @@ namespace WeightBalancePlus.ViewModels
                 return;
 
             var pilots = LoadItems.OfType<Pilot>().ToList();
-            if (pilots.Count > TargetAircraft.RequiredCrew)
+            if (pilots.Count == TargetAircraft.RequiredCrew)
+            {
+                var standardNames = new string[] { Resources.Pilot, Resources.Copilot };
+                for (int i = 0; i < pilots.Count; i++)
+                {
+                    var pilot = pilots[i];
+                    if (!standardNames.Contains(pilot.Name))
+                        continue;
+
+                    if (i == 0)
+                        pilots[i].Name = Resources.Pilot;
+                    else
+                        pilots[i].Name = Resources.Copilot;
+                }
+            }
+            else if (pilots.Count > TargetAircraft.RequiredCrew)
             {
                 for (int i = pilots.Count - 1; i > TargetAircraft.RequiredCrew - 1; i--)
                     LoadItems.Remove(pilots[i]);
             }
             else
             {
-                if (pilots.Count == 1)
-                    pilots[0].Name = Resources.Pilot;
-
                 for (int i = pilots.Count; i < TargetAircraft.RequiredCrew; i++)
                 {
                     var seatRow = SeatRows.FirstOrDefault(x => x.PilotSeats);
